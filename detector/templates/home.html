@@ -1,8 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="text-center mt-5">
-    <h2 class="mb-3">Welcome to the Mental Health Detector</h2>
-    <p class="lead mb-4">Understand your emotional well-being and take steps to improve it.</p>
-    <a href="{% url 'assessment' %}" class="btn btn-success btn-lg">Start Assessment</a>
+
+<div class="card p-5 text-center">
+    <h1 class="fw-semibold mb-3">Mental Health Detector</h1>
+    <p class="text-muted mb-4">
+        Track emotional well-being, analyze mood patterns, and gain insights
+        through journaling and structured assessments.
+    </p>
+
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'assessment' %}" class="btn btn-success btn-lg">
+            Start Assessment
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">
+            View Dashboard
+        </a>
+        {% endif %}
+    </div>
 </div>
+
 {% endblock %}

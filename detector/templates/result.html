@@ -1,26 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-5">
-    <div class="card p-4 shadow-sm">
-        <h2 class="mb-4 text-center">🧠 Assessment Result</h2>
+<div class="card p-5 text-center">
+    <h3 class="fw-semibold mb-3">Assessment Result</h3>
 
-        <div class="alert alert-info">
-            <h4 class="mb-2">Score: {{ score }}</h4>
-            <p>{{ message }}</p>
-        </div>
-
-        {% if ai_tip %}
-        <div class="alert alert-warning">
-            <h5>💡 AI-Based Suggestion:</h5>
-            <p>{{ ai_tip }}</p>
-        </div>
-        {% endif %}
-
-        <div class="text-center">
-            <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">Go to Dashboard</a>
-        </div>
+    <div class="alert alert-info">
+        <h4>Score: {{ score }}</h4>
+        <p>{{ message }}</p>
     </div>
+
+    {% if ai_tip %}
+    <div class="alert alert-warning">
+        <p>{{ ai_tip }}</p>
+    </div>
+    {% endif %}
+
+    <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">
+        Go to Dashboard
+    </a>
 </div>
 
 {% endblock %}

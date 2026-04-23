@@ -1,26 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-4" style="max-width: 700px;">
-    <h2 class="mb-2">🤖 Mental Health Chatbot</h2>
-    <p class="text-muted mb-4">You can ask things like: <em>“I'm feeling sad”</em>, <em>“Any tips?”</em>, <em>“I'm anxious”</em>, etc.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
 
-    <form method="post" class="mb-4">
-        {% csrf_token %}
-        <div class="input-group shadow-sm">
-            <input type="text" name="message" class="form-control" placeholder="Type your message..." required>
-            <button type="submit" class="btn btn-primary">Send</button>
-        </div>
-    </form>
+        <div class="card p-4 mb-4">
+            <h3 class="fw-semibold mb-2">Mental Health Chatbot</h3>
+            <p class="text-muted mb-4">
+                You may describe how you are feeling or ask for general mental well-being guidance.
+            </p>
 
-    {% if user_message %}
-        <div class="card p-3 mb-3 shadow-sm">
-            <strong>You:</strong> {{ user_message }}
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input
+                        type="text"
+                        name="message"
+                        class="form-control"
+                        placeholder="Type your message here..."
+                        required
+                    >
+                    <button type="submit" class="btn btn-primary">
+                        Send
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="card bg-primary text-white p-3 shadow-sm">
-            <strong>Bot:</strong> {{ response }}
+
+        {% if user_message %}
+        <div class="card p-3 mb-3">
+            <small class="text-muted">You</small>
+            <p class="mb-0">{{ user_message }}</p>
         </div>
-    {% endif %}
+
+        <div class="card p-3 bg-light">
+            <small class="text-muted">Chatbot Response</small>
+            <p class="mb-0">{{ response }}</p>
+        </div>
+        {% endif %}
+
+    </div>
 </div>
 
 {% endblock %}

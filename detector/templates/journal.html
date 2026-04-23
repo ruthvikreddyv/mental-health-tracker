@@ -1,84 +1,57 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% if show_resources %}
-<div class="alert alert-danger">
-    <h5>🛑 We're Here for You</h5>
-    <p>Your recent journal entry seems to reflect low mood. Here are some helpful resources:</p>
-    <ul>
-        <li><a href="https://www.headspace.com" target="_blank">Headspace – Meditation & Sleep</a></li>
-        <li><a href="https://www.7cups.com" target="_blank">7 Cups – Free Emotional Support</a></li>
-        <li><a href="https://www.betterhelp.com" target="_blank">BetterHelp – Talk to a Therapist</a></li>
-        <li><strong>India Helpline:</strong> 9152987821 (iCall)</li>
-    </ul>
-</div>
-{% endif %}
+<div class="row g-4">
 
-<h3>Your Mood Trend</h3>
-<canvas id="moodChart" height="100"></canvas>
+    <div class="col-lg-7">
+        <div class="card p-4 mb-4">
+            <h5 class="mb-3">Mood Trend</h5>
+            <canvas id="moodChart" height="120"></canvas>
+        </div>
 
-<hr>
-
-<h3>Write a New Journal Entry</h3>
-<form method="post" class="mb-4">
-    {% csrf_token %}
-    <textarea name="text" class="form-control" rows="4" placeholder="How are you feeling today?"></textarea>
-    <button type="submit" class="btn btn-primary mt-2">Submit</button>
-</form>
-
-<h4 class="mt-5">Your Past Entries</h4>
-{% for entry in entries %}
-    <div class="card mb-3 {{ entry.mood_class }}">
-        <div class="card-body">
-            <p>“{{ entry.text }}”</p>
-            <p><small>🧠 Polarity: {{ entry.polarity|floatformat:2 }}</small></p>
-            <p><small class="text-muted">🕒 {{ entry.created_at }}</small></p>
+        <div class="card p-4">
+            <h5 class="mb-3">Past Entries</h5>
+            {% for entry in entries %}
+                <div class="border-bottom pb-2 mb-2">
+                    <p class="mb-1">{{ entry.text }}</p>
+                    <small class="text-muted">
+                        Polarity: {{ entry.polarity|floatformat:2 }} · {{ entry.created_at }}
+                    </small>
+                </div>
+            {% endfor %}
         </div>
     </div>
-{% endfor %}
 
-{% if ai_tip %}
-<div class="alert alert-success mt-4">
-    <h5>💡 Mental Health Tip:</h5>
-    <p>{{ ai_tip }}</p>
+    <div class="col-lg-5">
+        <div class="card p-4">
+            <h5 class="mb-3">New Journal Entry</h5>
+            <form method="post">
+                {% csrf_token %}
+                <textarea name="text" class="form-control mb-3" rows="6"
+                          placeholder="Write about how you feel today..."></textarea>
+                <button class="btn btn-primary w-100">Save Entry</button>
+            </form>
+        </div>
+    </div>
+
 </div>
-{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('moodChart').getContext('2d');
-    const moodChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ labels|safe }},
-            datasets: [{
-                label: 'Mood Polarity Over Time',
-                data: {{ data|safe }},
-                fill: false,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    min: -1,
-                    max: 1,
-                    title: {
-                        display: true,
-                        text: 'Polarity (-1 to 1)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                }
-            }
-        }
-    });
+new Chart(document.getElementById('moodChart'), {
+    type: 'line',
+    data: {
+        labels: {{ labels|safe }},
+        datasets: [{
+            data: {{ data|safe }},
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        scales: { y: { min: -1, max: 1 } }
+    }
+});
 </script>
 
 {% endblock %}

@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2 class="mb-3">Mental Health Assessment</h2>
-<p>Please answer the following questions based on how you've been feeling in the past two weeks:</p>
+<div class="card p-5">
+    <h3 class="fw-semibold mb-3">Mental Health Assessment</h3>
+    <p class="text-muted mb-4">
+        Answer based on how you have been feeling over the past two weeks.
+    </p>
 
-<form method="POST" class="mt-4">
-    {% csrf_token %}
-    {% for num, question in questions.items %}
-        <div class="mb-4">
-            <label class="form-label d-block"><strong>Q{{ num }}.</strong> {{ question }}</label>
-            {% for value, label in options %}
-                <div class="form-check form-check-inline">
-                    <input 
-                        class="form-check-input" 
-                        type="radio" 
-                        name="q{{ num }}" 
-                        value="{{ value }}" 
-                        id="q{{ num }}_{{ value }}" 
-                        required
-                    >
-                    <label class="form-check-label" for="q{{ num }}_{{ value }}">{{ label }}</label>
+    <form method="post">
+        {% csrf_token %}
+        {% for num, question in questions.items %}
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
+                    Q{{ num }}. {{ question }}
+                </label>
+                {% for value, label in options %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="q{{ num }}" value="{{ value }}" required>
+                    <label class="form-check-label">{{ label }}</label>
                 </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-success">Submit Assessment</button>
-</form>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button class="btn btn-success">Submit Assessment</button>
+    </form>
+</div>
 
 {% endblock %}

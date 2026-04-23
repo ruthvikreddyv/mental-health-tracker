@@ -1,131 +1,70 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2 class="mb-4">Welcome to Your Mental Health Dashboard</h2>
+<h2 class="fw-semibold mb-4">Dashboard Overview</h2>
 
-<div class="alert alert-info">
-    <h4>Last Assessment Score: 
-        {% if last_score is not None %}
-            {{ last_score }}
-        {% else %}
-            Not Taken Yet
-        {% endif %}
-    </h4>
-    <p>{{ assessment_msg }}</p>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <small class="text-muted">Last Assessment Score</small>
+            <h4 class="mt-2">{{ last_score|default:"Not Taken" }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <small class="text-muted">Total Journal Entries</small>
+            <h4 class="mt-2">{{ total_entries }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <small class="text-muted">Average Mood</small>
+            <h4 class="mt-2">{{ avg_polarity|floatformat:2 }}</h4>
+        </div>
+    </div>
 </div>
 
-<div class="mb-4 text-center">
-    <button class="btn btn-outline-primary me-2" onclick="showChart('mood')">Mood Trend</button>
-    <button class="btn btn-outline-danger" onclick="showChart('assessment')">Assessment Scores</button>
+<div class="card p-4 mb-4">
+    <h5 class="mb-3">Mood Trend</h5>
+    <canvas id="moodChart" height="120"></canvas>
 </div>
 
-<div id="moodChartContainer" class="card p-4 mb-4">
-    <h5 class="mb-3">Mood Polarity Over Time</h5>
-    {% if labels %}
-        <canvas id="moodChart" height="100"></canvas>
-    {% else %}
-        <p class="text-muted">No mood data yet.</p>
-    {% endif %}
+<div class="card p-4">
+    <h5 class="mb-3">Assessment History</h5>
+    <canvas id="assessmentChart" height="120"></canvas>
 </div>
-
-<div id="assessmentChartContainer" class="card p-4 mb-4" style="display: none;">
-    <h5 class="mb-3">Assessment Score History</h5>
-    {% if assess_labels %}
-        <canvas id="assessmentChart" height="100"></canvas>
-    {% else %}
-        <p class="text-muted">No assessment scores available.</p>
-    {% endif %}
-</div>
-
-<hr>
-
-<h3>Journal Summary</h3>
-<ul>
-    <li>Total Entries: <strong>{{ total_entries }}</strong></li>
-    <li>Average Mood (Polarity): <strong>{{ avg_polarity|floatformat:2 }}</strong></li>
-    <li>Latest Mood: 
-        {% if latest_polarity %}
-            <strong>{{ latest_polarity }}</strong>
-        {% else %}
-            <strong>No entries yet</strong>
-        {% endif %}
-    </li>
-</ul>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const moodCtx = document.getElementById('moodChart')?.getContext('2d');
-    const assessCtx = document.getElementById('assessmentChart')?.getContext('2d');
-
-    if (moodCtx) {
-        new Chart(moodCtx, {
-            type: 'line',
-            data: {
-                labels: {{ labels|default:"[]"|safe }},
-                datasets: [{
-                    label: 'Mood Polarity',
-                    data: {{ data|default:"[]"|safe }},
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    fill: false,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        min: -1,
-                        max: 1,
-                        title: { display: true, text: 'Polarity (-1 to 1)' }
-                    },
-                    x: {
-                        title: { display: true, text: 'Date' }
-                    }
-                }
-            }
-        });
+new Chart(document.getElementById('moodChart'), {
+    type: 'line',
+    data: {
+        labels: {{ labels|default:"[]"|safe }},
+        datasets: [{
+            label: 'Mood Polarity',
+            data: {{ data|default:"[]"|safe }},
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        scales: { y: { min: -1, max: 1 } }
     }
+});
 
-    if (assessCtx) {
-        new Chart(assessCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ assess_labels|default:"[]"|safe }},
-                datasets: [{
-                    label: 'Assessment Scores',
-                    data: {{ assess_scores|default:"[]"|safe }},
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        min: 0,
-                        max: 30,
-                        title: { display: true, text: 'Score (0–30)' }
-                    },
-                    x: {
-                        title: { display: true, text: 'Date' }
-                    }
-                }
-            }
-        });
+new Chart(document.getElementById('assessmentChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ assess_labels|default:"[]"|safe }},
+        datasets: [{
+            label: 'Assessment Score',
+            data: {{ assess_scores|default:"[]"|safe }}
+        }]
+    },
+    options: {
+        scales: { y: { min: 0, max: 30 } }
     }
-
-    function showChart(type) {
-        document.getElementById('moodChartContainer').style.display = type === 'mood' ? 'block' : 'none';
-        document.getElementById('assessmentChartContainer').style.display = type === 'assessment' ? 'block' : 'none';
-    }
-
-    // Auto show chart based on data availability
-    {% if labels and not assess_labels %}
-        showChart('mood');
-    {% elif assess_labels and not labels %}
-        showChart('assessment');
-    {% else %}
-        showChart('mood');
-    {% endif %}
+});
 </script>
 
 {% endblock %}
