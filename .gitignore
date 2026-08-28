@@ -13,7 +13,6 @@ db.sqlite3
 *.log
 
 # Environment variables
-.env
 .env.*
 
 # macOS
@@ -33,3 +32,5 @@ htmlcov/
 *.egg-info/
 dist/
 build/
+
+.env
