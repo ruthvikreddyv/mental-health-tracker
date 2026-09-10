@@ -8,6 +8,7 @@ The project is designed as an educational and experimental platform that combine
 
 ## Features
 
+
 ### User Authentication
 
 * User registration and login
