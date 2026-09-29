@@ -5,7 +5,6 @@ A Django-based web application for tracking mental well-being through structured
 The project is designed as an educational and experimental platform that combines web development with natural language processing to help users record and understand changes in their emotional state over time.
 
 ## Features
-
 ### User Authentication
 
 * User registration and login
