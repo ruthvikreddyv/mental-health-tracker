@@ -1,5 +1,6 @@
 # Mental Health Tracker
 
+
 A Django-based web application for tracking mental well-being through structured assessments, journal-based sentiment analysis, mood visualization, and an interactive mental health chatbot.
 
 The project is designed as an educational and experimental platform that combines web development with natural language processing to help users record and understand changes in their emotional state over time.
