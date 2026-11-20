@@ -1,0 +1,8 @@
+Django>=5.2,<6.0
+dj-database-url>=2.3,<4
+psycopg[binary]>=3.2,<4
+whitenoise>=6.8,<8
+textblob>=0.18,<1
+openai>=1.55,<3
+python-dotenv>=1,<2
+requests>=2.32,<3

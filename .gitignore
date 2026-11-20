@@ -1,36 +1,16 @@
-# Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Virtual environment
+.venv/
 venv/
 env/
-.venv/
-
-# Django
-db.sqlite3
-*.log
-
-# Environment variables
-.env.*
-
-# macOS
-.DS_Store
-
-# IDEs
-.vscode/
-.idea/
-
-# Python tools
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
-
-# Distribution
-*.egg-info/
-dist/
-build/
-
 .env
+.env.*
+!.env.example
+db.sqlite3
+*.sqlite3
+staticfiles/
+.vercel/
+.DS_Store
+.pytest_cache/
+*.egg-info/
+nltk_data/
