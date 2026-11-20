@@ -1,3 +1,140 @@
-{% extends 'detector/base.html' %}{% load static %}{% block content %}
-<div class="demo-shell container"><aside class="sidebar"><div class="side-upper"><span class="eyebrow">PERSONAL WORKSPACE</span><h2>Your space</h2><p>Just for you, in this browser.</p></div><nav aria-label="Workspace sections" class="side-links"><button class="side-active" data-view="overview"><span>◫</span> Overview</button><button data-view="journal"><span>▤</span> Journal</button><button data-view="checkin"><span>◉</span> Check-in</button><button data-view="insights"><span>▥</span> Insights</button><button data-view="support"><span>♡</span> Support</button><button data-view="settings"><span>⚙</span> Privacy</button></nav><div class="side-bottom"><span class="side-circle">✳</span><div><strong>Give yourself grace</strong><p>Every little step counts.</p></div></div></aside>
-<div class="demo-content"><div class="workspace-toolbar"><div class="data-status"><span class="data-status-dot"></span><span id="data-mode-label">Browser-only private demo</span></div><div class="toolbar-actions"><button type="button" id="theme-toggle" class="icon-button" aria-label="Toggle dark mode" title="Toggle dark mode">☾</button><button type="button" class="btn btn-light account-button" id="cloud-auth-open">Connect my account</button><button type="button" id="cloud-signout" class="btn btn-light hidden">Sign out</button></div></div><div class="demo-header"><div><span class="eyebrow">MY WELL-BEING JOURNEY</span><h1 ���q�^
+{% extends 'detector/base.html' %}
+{% load static %}
+{% block title %}Your space · Mindful Space{% endblock %}
+{% block content %}
+<div class="demo-shell container">
+  <aside class="sidebar" aria-label="Workspace sidebar">
+    <div class="side-upper">
+      <div class="workspace-avatar" aria-hidden="true">✳</div>
+      <span class="eyebrow">A little place for you</span>
+      <h2>Your space<span class="brand-period">.</span></h2>
+      <p>Show up exactly as you are.</p>
+    </div>
+    <p class="nav-section-label">Your everyday tools</p>
+    <nav class="side-links" aria-label="Workspace sections">
+      <button type="button" class="side-active" data-view="overview" aria-current="page"><span class="side-icon" aria-hidden="true">◫</span> Overview <span class="side-arrow" aria-hidden="true">↗</span></button>
+      <button type="button" data-view="journal"><span class="side-icon" aria-hidden="true">≡</span> Journal <span class="side-arrow" aria-hidden="true">↗</span></button>
+      <button type="button" data-view="checkin"><span class="side-icon" aria-hidden="true">◉</span> Check-in <span class="side-arrow" aria-hidden="true">↗</span></button>
+      <button type="button" data-view="insights"><span class="side-icon" aria-hidden="true">▥</span> Insights <span class="side-arrow" aria-hidden="true">↗</span></button>
+      <button type="button" data-view="support"><span class="side-icon" aria-hidden="true">♡</span> Support <span class="side-arrow" aria-hidden="true">↗</span></button>
+      <button type="button" data-view="settings"><span class="side-icon" aria-hidden="true">⚙</span> Privacy <span class="side-arrow" aria-hidden="true">↗</span></button>
+    </nav>
+    <div class="side-bottom">
+      <span class="side-bottom-doodle" aria-hidden="true">✳</span>
+      <p>"You don't have to have it all figured out."</p>
+      <span>— A reminder for today</span>
+    </div>
+  </aside>
+
+  <div class="demo-content">
+    <div class="workspace-toolbar">
+      <div class="data-status"><span class="data-status-dot"></span><span id="data-mode-label">Checking storage mode…</span></div>
+      <div class="toolbar-actions">
+        <button type="button" id="theme-toggle" class="icon-button" aria-label="Toggle dark mode" title="Change appearance">☾</button>
+        <button type="button" class="btn btn-primary account-button" id="cloud-auth-open">Save to my account <span aria-hidden="true">↗</span></button>
+        <button type="button" id="cloud-signout" class="btn btn-light hidden">Sign out</button>
+      </div>
+    </div>
+
+    <div class="demo-header">
+      <div><span class="eyebrow">Welcome to your corner</span><h1 id="view-heading">Your day, at your pace.</h1><p id="view-subtitle" class="muted">A little space to notice how you're doing.</p></div>
+      <div class="date-chip" id="today-chip" aria-label="Current date">Today</div>
+    </div>
+    <div id="demo-alert" class="notice private-notice" role="note">
+      <span class="private-icon" aria-hidden="true">◉</span>
+      <div><strong id="privacy-status-title">Private demo mode.</strong> <span id="privacy-status-copy">Your reflections stay in this browser. Avoid sharing sensitive details on shared devices.</span></div>
+    </div>
+
+    <section id="overview-view" class="demo-view" aria-label="Overview">
+      <div class="welcome-card">
+        <div class="welcome-words"><span class="eyebrow">A gentle reminder</span><h2>A little kindness<br>goes a long way.</h2><p>You don't need a perfect day to take care of yourself.</p><button type="button" class="btn btn-dark" data-go="journal">Write a reflection <span aria-hidden="true">↗</span></button></div>
+        <div class="welcome-art" aria-hidden="true"><div class="art-halo"></div><div class="art-sun"></div><div class="art-hill art-hill-1"></div><div class="art-hill art-hill-2"></div><div class="art-branch art-branch-1"><i></i><i></i></div><div class="art-branch art-branch-2"><i></i><i></i></div><span class="art-spark">✳</span></div>
+      </div>
+
+      <div class="section-row"><div><h2>How's your day feeling?</h2><p>Choose the closest feeling. There's no wrong answer.</p></div><span class="tiny-label">Just for today</span></div>
+      <div class="mood-panel"><div id="mood-options" class="mood-choice" role="group" aria-label="How you feel today">
+        <button type="button" data-mood="1" aria-pressed="false"><span class="mood-face mood-lowest" aria-hidden="true"><i></i></span><span>Rough</span></button>
+        <button type="button" data-mood="2" aria-pressed="false"><span class="mood-face mood-low" aria-hidden="true"><i></i></span><span>A little low</span></button>
+        <button type="button" data-mood="3" aria-pressed="false"><span class="mood-face mood-okay" aria-hidden="true"><i></i></span><span>Somewhere in between</span></button>
+        <button type="button" data-mood="4" aria-pressed="false"><span class="mood-face mood-good" aria-hidden="true"><i></i></span><span>Pretty good</span></button>
+        <button type="button" data-mood="5" aria-pressed="false"><span class="mood-face mood-great" aria-hidden="true"><i></i></span><span>Really good</span></button>
+      </div><p id="mood-feedback" class="mood-feedback" role="status">Pick how you feel to add it to your next journal entry.</p></div>
+
+      <div class="section-row"><div><h2>Your little milestones</h2><p>Nothing to race toward. Just moments you've made space for.</p></div></div>
+      <div class="metric-grid">
+        <article class="metric"><div class="metric-head"><span>Journal moments</span><span class="metric-icon metric-green" aria-hidden="true">✎</span></div><strong id="total-journals">0</strong><small>Thoughts you've put into words</small></article>
+        <article class="metric"><div class="metric-head"><span>Check-ins</span><span class="metric-icon metric-peach" aria-hidden="true">◉</span></div><strong id="total-checkins">0</strong><small>Times you paused for yourself</small></article>
+        <article class="metric"><div class="metric-head"><span>Latest check-in</span><span class="metric-icon metric-lavender" aria-hidden="true">↗</span></div><strong id="last-checkin">—</strong><small>Out of 30 · not a diagnosis</small></article>
+      </div>
+
+      <div class="grid-two overview-bottom">
+        <article class="panel content-panel compose-panel"><div class="panel-top"><div><span class="eyebrow">An open page</span><h3>What's on your mind?</h3><p class="muted">A sentence is a wonderful start.</p></div><span class="panel-icon" aria-hidden="true">✎</span></div>
+          <div class="prompt-chip-row" role="group" aria-label="Journal prompts"><button type="button" class="prompt-chip" data-prompt="Today, something that made me smile was…">Something good</button><button type="button" class="prompt-chip" data-prompt="One thing I want to let go of is…">Letting go</button><button type="button" class="prompt-chip" data-prompt="Right now, I wish I had more of…">What I need</button></div>
+          <label for="overview-text" class="visually-hidden">Your quick reflection</label><textarea id="overview-text" class="journal-input" maxlength="3000" rows="4" placeholder="Start wherever you'd like…"></textarea>
+          <div class="panel-actions"><span class="small muted">Write a little or a lot</span><button type="button" class="btn btn-primary" id="quick-save">Save reflection <span aria-hidden="true">↗</span></button></div>
+        </article>
+        <article class="panel content-panel recent-panel"><div class="panel-top"><div><span class="eyebrow">Looking back</span><h3>Recent reflections</h3><p class="muted">Your story, one entry at a time.</p></div><button type="button" class="text-button" data-go="journal">View all <span aria-hidden="true">↗</span></button></div>
+          <div id="recent-reflections"><div class="empty"><span class="empty-leaf" aria-hidden="true">✳</span><p>Just a blank page for now. That's a beautiful place to start.</p></div></div>
+        </article>
+      </div>
+      <div class="breath-banner"><div class="breath-orb" id="breath-orb" aria-hidden="true"><span>◌</span></div><div><span class="eyebrow">A moment to reset</span><h3>Need a small pause?</h3><p id="breath-message">Try a gentle guided breathing pause. Stop whenever you like.</p></div><button type="button" id="breath-start" class="btn btn-light" aria-pressed="false">Start breathing <span aria-hidden="true">↗</span></button></div>
+    </section>
+
+    <section id="journal-view" class="demo-view hidden" aria-label="Your journal">
+      <div class="journal-intro"><div><span class="eyebrow">Your private notebook</span><h2>Let's put it into words.</h2><p>It doesn't need to sound beautiful. It just needs to be yours.</p></div><span class="journal-illustration" aria-hidden="true">✎</span></div>
+      <div class="grid-two journal-grid">
+        <article class="panel content-panel"><div class="panel-top"><div><h3>Write a reflection</h3><p class="muted">How was today, really?</p></div></div><div class="prompt-chip-row"><button type="button" class="prompt-chip" data-prompt="A moment I want to remember from today is…">A good moment</button><button type="button" class="prompt-chip" data-prompt="Something that's been on my mind is…">On my mind</button><button type="button" class="prompt-chip" data-prompt="Tomorrow, I'd like to give myself permission to…">Tomorrow</button></div>
+          <label for="journal-text" class="field-label">Your words</label><textarea id="journal-text" class="journal-input" maxlength="3000" rows="8" placeholder="Dear me, today…"></textarea>
+          <div class="panel-actions"><span id="journal-count" class="small muted">0 / 3000 characters</span><button type="button" class="btn btn-primary" id="journal-save">Save entry <span aria-hidden="true">↗</span></button></div>
+        </article>
+        <article class="panel content-panel journal-list-panel"><div class="panel-top"><div><h3>Past reflections</h3><p class="muted">A collection of your moments.</p></div></div>
+          <div class="journal-tools"><label class="visually-hidden" for="journal-search">Search past reflections</label><input id="journal-search" type="search" placeholder="Search your entries" autocomplete="off" maxlength="120" class="journal-search"><label class="visually-hidden" for="journal-sort">Sort reflections</label><select id="journal-sort" class="journal-sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></div>
+          <div id="all-reflections" class="reflection-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="checkin-view" class="demo-view hidden" aria-label="Self reflection questionnaire">
+      <div class="checkin-wrap"><div class="checkin-intro"><span class="eyebrow">A mindful moment</span><h2>How have things been lately?</h2><p>Think of your last two weeks. No right or wrong answers, just what feels true.</p></div>
+        <div class="notice checkin-notice"><span aria-hidden="true">ⓘ</span> This original questionnaire is not a clinically validated screening tool. It cannot diagnose any mental-health condition.</div>
+        <div class="panel survey-card"><div class="survey-progress-label"><span id="survey-progress-label">0 of 10 answered</span><span class="small muted">About 2 minutes</span></div><div class="survey-progress"><span id="survey-progress" style="width:0%"></span></div>
+        <form id="checkin-form"><div id="survey-questions"></div><div class="panel-actions survey-actions"><button type="button" id="question-back" class="btn btn-light hidden">← Previous</button><span class="small muted" id="question-helper">Take your time.</span><button type="button" class="btn btn-primary hidden" id="question-next">Next question →</button><button type="submit" id="question-submit" class="btn btn-primary">Save my check-in <span aria-hidden="true">↗</span></button></div></form></div>
+        <div id="survey-result" class="panel content-panel result-panel hidden" role="status"></div>
+      </div>
+    </section>
+
+    <section id="insights-view" class="demo-view hidden" aria-label="Personal insights">
+      <div class="insights-intro"><span class="eyebrow">Look how far you've come</span><h2>A view of your days.</h2><p>Not every day needs to be a good day. Patterns simply help you notice.</p></div>
+      <div class="metric-grid"><article class="metric"><div class="metric-head"><span>Journal entries</span><span class="metric-icon metric-green">✎</span></div><strong id="insight-journals">0</strong><small>Reflections written</small></article><article class="metric"><div class="metric-head"><span>Check-ins</span><span class="metric-icon metric-peach">◉</span></div><strong id="insight-checkins">0</strong><small>Moments of self-awareness</small></article><article class="metric"><div class="metric-head"><span>Last reflection</span><span class="metric-icon metric-lavender">↗</span></div><strong id="insight-latest">—</strong><small>Keep going at your own pace</small></article></div>
+      <div class="grid-two"><article class="panel content-panel chart-panel"><h3>Journal activity</h3><p class="muted">The days you stopped to write.</p><div id="activity-chart" class="activity-chart" role="img" aria-label="Recent journal activity chart"></div></article><article class="panel content-panel chart-panel"><h3>Check-in history</h3><p class="muted">Your reflection totals over time, not clinical scores.</p><div id="score-chart" class="activity-chart" role="img" aria-label="Recent self-reflection totals chart"></div></article></div>
+      <div class="notice checkin-notice">These visuals summarize your entries, not your overall health or well-being. A qualified professional can help with ongoing concerns.</div>
+    </section>
+
+    <section id="support-view" class="demo-view hidden" aria-label="Support and well-being ideas"><div class="support-hero"><span class="eyebrow">Care looks different for everyone</span><h2>You deserve to feel supported.</h2><p>Sometimes it's a deep breath. Sometimes it's a conversation. Both matter.</p></div>
+      <div class="support-grid"><article class="support-tile"><span class="support-number">01</span><div class="support-doodle support-doodle-1">◒</div><h3>Find your feet</h3><p>Gently name five things you can see, four things you can feel, and three things you can hear.</p></article><article class="support-tile"><span class="support-number">02</span><div class="support-doodle support-doodle-2">♡</div><h3>Lean on someone</h3><p>A simple "Could we talk?" is enough to begin. Reach out to someone you trust.</p></article><article class="support-tile"><span class="support-number">03</span><div class="support-doodle support-doodle-3">✳</div><h3>Ask for more support</h3><p>If your feelings are hard to manage or affect daily life, consider a qualified professional.</p></article></div>
+      <div class="notice urgent"><strong>If you or someone else is in immediate danger:</strong> Contact your local emergency services or visit the nearest emergency department. Ask someone you trust to stay with you while you get help.</div>
+    </section>
+
+    <section id="settings-view" class="demo-view hidden" aria-label="Privacy and data controls"><div class="privacy-intro"><span class="eyebrow">You're in control</span><h2>Your story belongs to you.</h2><p>Understand where your entries live and what you can do with them.</p></div>
+      <div class="panel content-panel privacy-panel"><div class="settings-row"><div><h3>Save a copy of your entries</h3><p>Download a JSON file with your journal entries and check-ins.</p></div><button type="button" id="export-data" class="btn btn-light">Export my data ↗</button></div><div class="settings-row" id="import-cloud-row"><div><h3>Bring your demo entries along</h3><p>Move browser entries to your connected account if you choose to.</p></div><button type="button" id="import-demo" class="btn btn-light">Import to account</button></div><div class="settings-row"><div><h3>Start with a clean page</h3><p>Permanently delete your saved journal and check-in data. This cannot be undone.</p></div><button type="button" id="clear-data" class="btn btn-danger">Delete my data</button></div>
+        <div class="notice"><strong>About your storage: </strong><span id="settings-storage-note">This browser's demo data is stored locally and is not encrypted. Avoid shared devices.</span></div>
+      </div>
+    </section>
+    <div class="demo-bottom"><span>Take what you need today.</span><span id="mode-footer">Checking connection</span></div>
+  </div>
+</div>
+
+<div id="auth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-heading">
+  <div class="auth-modal panel"><button type="button" id="auth-close" class="auth-dismiss" aria-label="Close sign-in dialog">×</button><div class="modal-flower" aria-hidden="true">✳</div><span class="eyebrow">Make this space yours</span><h2 id="auth-heading">Welcome back</h2><p class="muted" id="auth-description">Sign in to keep your entries on your own account.</p>
+    <div class="auth-tabs" role="tablist"><button type="button" id="auth-login-tab" class="tab-selected" aria-selected="true">Sign in</button><button type="button" id="auth-signup-tab" aria-selected="false">Create account</button></div>
+    <form id="auth-form"><label for="auth-email">Email address</label><input type="email" id="auth-email" autocomplete="email" placeholder="you@example.com" required maxlength="254"><label for="auth-password">Password</label><input type="password" id="auth-password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required><p class="error hidden" id="auth-error" role="alert"></p><button id="auth-submit" type="submit" class="btn btn-primary auth-submit">Sign in securely →</button></form>
+    <p class="small muted auth-footnote">Your account is protected with Supabase authentication. Your entries are only accessible with your account.</p>
+  </div>
+</div>
+<div id="app-toast" class="app-toast hidden" role="status" aria-live="polite"></div>
+{{ questions|json_script:'demo-question-data' }}
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js" defer></script>
+<script src="{% static 'detector/demo.js' %}" defer></script>
+{% endblock %}

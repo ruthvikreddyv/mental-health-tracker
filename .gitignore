@@ -2,7 +2,6 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
-env/
 .env
 .env.*
 !.env.example
@@ -12,5 +11,3 @@ staticfiles/
 .vercel/
 .DS_Store
 .pytest_cache/
-*.egg-info/
-nltk_data/

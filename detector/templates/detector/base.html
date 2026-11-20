@@ -1,4 +1,38 @@
-{% load static %}<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f9f6"><meta name="description" content="A calm space to reflect on your mental well-being, journal, and notice patterns."><title>Mindful Space Â· Mental Health Tracker</title><link rel="stylesheet" href="{% static 'detector/style.css' %}"><link rel="stylesheet" href="{% static 'detector/enhancements.css' %}"></head><body>
-<header class="top"><div class="container nav"><a class="logo" href="{% url 'home' %}"><span class="logo-mark">âœ³</span> mindful<span>space</span></a><nav aria-label="Main navigation"><a href="{% url 'home' %}">Home</a><a href="{% url 'demo' %}">Explore</a>{% if storage_enabled %}{% if user.is_authenticated %}<a href="{% url 'dashboard' %}">Dashboard</a><a href="{% url 'journal' %}">Journal</a><a href="{% url 'assessment' %}">Check-in</a><a href="{% url 'chatbot' %}">Support</a><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="nav-button" type="submit">Log out</button></form>{% else %}<a class="nav-pill" href="{% url 'login' %}">Log in</a>{% endif %}{% endif %}</nav></div></header>
-{% if messages %}<div class="container">{% for msg in messages %}<div class="notice">{{msg}}</div>{% endfor %}</div>{% endif %}<main>{% block content %}{% endblock %}</main><footer><div class="container footer"><span>Â© 2026 Mindful Space</span><span>Self-reflection only. N¶»§q«^
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f4">
+  <meta name="description" content="Mindful Space is your quiet corner to pause, reflect, and notice your own patterns. A private journaling and self-reflection companion.">
+  <title>{% block title %}Mindful Space Â· Make room for yourself{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'detector/style.css' %}">
+  <link rel="stylesheet" href="{% static 'detector/enhancements.css' %}">
+</head>
+<body>
+<header class="top" role="banner">
+  <div class="container nav">
+    <a class="logo" href="{% url 'home' %}" aria-label="Mindful Space home">
+      <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none" width="34" height="34"><rect width="36" height="36" rx="13" fill="#577866"/><path d="M18 9v18M9 18h18M11.6 11.6l12.8 12.8M24.4 11.6 11.6 24.4" stroke="#F9F8F1" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="18" r="4" fill="#D6E4D3"/></svg></span>
+      <span>mindful<span class="brand-secondary">space</span><span class="brand-period">.</span></span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="{% url 'home' %}" class="top-link">Home</a>
+      <a href="{% url 'demo' %}" class="top-link">Your space</a>
+      {% if storage_enabled %}{% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="top-link">Dashboard</a>
+      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="nav-button" type="submit">Log out</button></form>
+      {% else %}<a class="nav-pill" href="{% url 'login' %}">Log in <span aria-hidden="true">â†—</span></a>{% endif %}{% endif %}
+    </nav>
+  </div>
+</header>
+{% if messages %}<div class="container" role="status">{% for msg in messages %}<div class="notice">{{msg}}</div>{% endfor %}</div>{% endif %}
+<main id="main-content">{% block content %}{% endblock %}</main>
+<footer class="site-footer"><div class="container footer"><span>Â© 2026 Mindful Space</span><span>A space for self-reflection, not a substitute for professional care.</span><a href="{% url 'demo' %}">Visit your space <span aria-hidden="true">â†—</span></a></div></footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>
