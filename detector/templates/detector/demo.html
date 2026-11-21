@@ -1,14 +1,14 @@
 {% extends 'detector/base.html' %}
 {% load static %}
-{% block title %}Mental Health Detector{% endblock %}
+{% block title %}Mental Health Detector — Dashboard{% endblock %}
 {% block content %}
 <div class="demo-shell container">
   <aside class="sidebar" aria-label="Workspace sidebar">
     <div class="side-upper">
       <div class="workspace-avatar" aria-hidden="true">✳</div>
-      <span class="eyebrow">A little place for you</span>
-      <h2>Your space<span class="brand-period">.</span></h2>
-      <p>Show up exactly as you are.</p>
+      <span class="eyebrow">YOUR WELL-BEING SPACE</span>
+      <h2>Your dashboard</h2>
+      <p>Check in at your pace.</p>
     </div>
     <p class="nav-section-label">Your everyday tools</p>
     <nav class="side-links" aria-label="Workspace sections">
@@ -28,16 +28,16 @@
 
   <div class="demo-content">
     <div class="workspace-toolbar">
-      <div class="data-status"><span class="data-status-dot"></span><span id="data-mode-label">Checking storage mode…</span></div>
+      <div class="data-status"><span class="data-status-dot"></span><span id="data-mode-label">Checking your connection…</span></div>
       <div class="toolbar-actions">
         <button type="button" id="theme-toggle" class="icon-button" aria-label="Toggle dark mode" title="Change appearance">☾</button>
-        <button type="button" class="btn btn-primary account-button" id="cloud-auth-open">Save to my account <span aria-hidden="true">↗</span></button>
+        <button type="button" class="btn btn-primary account-button" id="cloud-auth-open">Log in / Sign up <span aria-hidden="true">↗</span></button>
         <button type="button" id="cloud-signout" class="btn btn-light hidden">Sign out</button>
       </div>
     </div>
 
     <div class="demo-header">
-      <div><span class="eyebrow">Welcome to your corner</span><h1 id="view-heading">Your day, at your pace.</h1><p id="view-subtitle" class="muted">A little space to notice how you're doing.</p></div>
+      <div><span class="eyebrow">YOUR PERSONAL DASHBOARD</span><h1 id="view-heading">A little clarity for today.</h1><p id="view-subtitle" class="muted">Everything you need to check in, in one place.</p></div>
       <div class="date-chip" id="today-chip" aria-label="Current date">Today</div>
     </div>
     <div id="demo-alert" class="notice private-notice" role="note">
@@ -124,17 +124,46 @@
   </div>
 </div>
 
-<div id="auth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-heading">
-  <div class="auth-modal panel"><button type="button" id="auth-close" class="auth-dismiss" aria-label="Close sign-in dialog">×</button><div class="modal-flower" aria-hidden="true">✳</div><span class="eyebrow">Make this space yours</span><h2 id="auth-heading">Welcome back</h2><p class="muted" id="auth-description">Sign in to keep your entries on your own account.</p>
-    <div class="auth-tabs" role="tablist"><button type="button" id="auth-login-tab" class="tab-selected" aria-selected="true">Sign in</button><button type="button" id="auth-signup-tab" aria-selected="false">Create account</button></div>
-    <form id="auth-form"><label for="auth-email">Email address</label><input type="email" id="auth-email" autocomplete="email" placeholder="you@example.com" required maxlength="254"><label for="auth-password">Password</label><input type="password" id="auth-password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required><p class="error hidden" id="auth-error" role="alert"></p><button id="auth-submit" type="submit" class="btn btn-primary auth-submit">Sign in securely →</button></form>
-    <p class="small muted auth-footnote">Your account is protected with Supabase authentication. Your entries are only accessible with your account.</p>
+<div id="auth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-heading" aria-describedby="auth-description">
+  <div class="auth-modal panel" tabindex="-1">
+    <button type="button" id="auth-close" class="auth-dismiss" aria-label="Close sign-in dialog">×</button>
+    <div class="auth-brand-row"><span class="auth-symbol" aria-hidden="true">✦</span><span>MENTAL HEALTH DETECTOR</span></div>
+    <h2 id="auth-heading">Welcome back</h2>
+    <p class="muted" id="auth-description">Sign in to access your saved reflections and check-ins.</p>
+    <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="Account actions">
+      <button type="button" role="tab" id="auth-login-tab" class="tab-selected" aria-selected="true">Log in</button>
+      <button type="button" role="tab" id="auth-signup-tab" aria-selected="false">Create account</button>
+    </div>
+    <div class="auth-info hidden" id="auth-info" role="status"></div>
+    <form id="auth-form" novalidate>
+      <label for="auth-email">Email address</label>
+      <input type="email" id="auth-email" autocomplete="email" inputmode="email" placeholder="name@example.com" required maxlength="254">
+      <div class="auth-password-row"><label for="auth-password">Password</label><button id="auth-forgot" class="auth-text-link" type="button">Forgot password?</button></div>
+      <div class="auth-password-wrap"><input type="password" id="auth-password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required><button class="password-eye" type="button" id="auth-show-password" aria-label="Show password">Show</button></div>
+      <div id="auth-confirm-wrap" class="hidden"><label for="auth-password-confirm">Confirm password</label><input type="password" id="auth-password-confirm" autocomplete="new-password" placeholder="Repeat your password" minlength="8"></div>
+      <p id="auth-error" class="auth-inline-error hidden" role="alert"></p>
+      <button id="auth-submit" type="submit" class="btn btn-primary auth-submit">Log in →</button>
+    </form>
+    <form id="auth-recovery-form" class="hidden" novalidate>
+      <label for="auth-recovery-email">Email address</label><input type="email" id="auth-recovery-email" placeholder="name@example.com" autocomplete="email" required>
+      <p class="muted auth-helper">We'll email you a secure link. For privacy, we won't disclose whether this address has an account.</p>
+      <p id="auth-recovery-error" class="auth-inline-error hidden" role="alert"></p>
+      <button type="submit" class="btn btn-primary auth-submit" id="auth-recovery-submit">Send reset link →</button>
+      <button type="button" class="auth-back-link" id="auth-back-login">← Back to log in</button>
+    </form>
+    <form id="auth-new-password-form" class="hidden" novalidate>
+      <label for="auth-new-password">New password</label><input id="auth-new-password" type="password" autocomplete="new-password" minlength="8" required>
+      <label for="auth-new-password-confirm">Confirm new password</label><input id="auth-new-password-confirm" type="password" autocomplete="new-password" minlength="8" required>
+      <p id="auth-new-password-error" class="auth-inline-error hidden" role="alert"></p>
+      <button type="submit" class="btn btn-primary auth-submit" id="auth-new-password-submit">Update password →</button>
+    </form>
+    <div class="auth-confirmation hidden" id="auth-confirmation"><span class="auth-confirm-icon">✓</span><h3>Check your inbox</h3><p>We've requested a confirmation email. Open the link to activate your account, then return to log in.</p><button id="auth-resend" type="button" class="btn btn-light">Resend confirmation email</button><button id="auth-confirm-back" type="button" class="auth-back-link">Back to log in</button></div>
+    <p class="small muted auth-footnote"><span aria-hidden="true">🔒</span> Secure accounts with Supabase Auth. Your reflections are accessible only to your account.</p>
   </div>
 </div>
 <div id="app-toast" class="app-toast hidden" role="status" aria-live="polite"></div>
 {{ questions|json_script:'demo-question-data' }}
 {% endblock %}
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js" defer></script>
 <script src="{% static 'detector/demo.js' %}" defer></script>
 {% endblock %}

@@ -39,7 +39,7 @@ def demo(request):return render(request,'detector/demo.html',{'questions':QUESTI
 def health(request):return JsonResponse({'status':'ok','storage_configured':enabled()})
 
 def signup(request):
-    if not enabled():return redirect('demo')
+    if not enabled():return redirect('/demo/?auth=signup')
     form=SignupForm(request.POST or None)
     if request.method=='POST' and form.is_valid():
         with transaction.atomic():
@@ -49,7 +49,7 @@ def signup(request):
     return screen(request,'signup',form=form)
 
 def signin(request):
-    if not enabled():return redirect('demo')
+    if not enabled():return redirect('/demo/?auth=login')
     return LoginView.as_view(template_name='detector/screen.html',authentication_form=SigninForm,extra_context={'page':'login'})(request)
 
 @require_POST

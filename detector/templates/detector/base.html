@@ -2,37 +2,36 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f8f4">
-  <meta name="description" content="Mental Health Detector is a private space for journaling, self-reflection, mood check-ins, and tracking personal well-being.">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f8fe">
+  <meta name="description" content="Mental Health Detector: a private journal, daily mood check-ins, and clear insights to help you reflect on your well-being.">
   <title>{% block title %}Mental Health Detector{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'detector/style.css' %}">
   <link rel="stylesheet" href="{% static 'detector/enhancements.css' %}">
+  <link rel="stylesheet" href="{% static 'detector/polish.css' %}">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <header class="top" role="banner">
   <div class="container nav">
     <a class="logo" href="{% url 'home' %}" aria-label="Mental Health Detector home">
-      <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none" width="34" height="34"><rect width="36" height="36" rx="13" fill="#577866"/><path d="M18 9v18M9 18h18M11.6 11.6l12.8 12.8M24.4 11.6 11.6 24.4" stroke="#F9F8F1" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="18" r="4" fill="#D6E4D3"/></svg></span>
-      <span class="logo-name">Mental Health Detector</span>
+      <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 42 42" width="42" height="42" fill="none"><rect width="42" height="42" rx="14" fill="#635BDA"/><path d="M11 24c4-9 6 1 10-8 4-8 7 9 11 1" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="30.5" cy="27" r="4" fill="#EAC5FF"/></svg></span>
+      <span class="logo-name">Mental Health <strong>Detector</strong></span>
     </a>
     <nav aria-label="Primary navigation">
       <a href="{% url 'home' %}" class="top-link">Home</a>
-      <a href="{% url 'demo' %}" class="top-link">Your space</a>
-      {% if storage_enabled %}{% if user.is_authenticated %}
-      <a href="{% url 'dashboard' %}" class="top-link">Dashboard</a>
-      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="nav-button" type="submit">Log out</button></form>
-      {% else %}<a class="nav-pill" href="{% url 'login' %}">Log in <span aria-hidden="true">↗</span></a>{% endif %}{% endif %}
+      <a href="{% url 'demo' %}" class="top-link">Workspace</a>
+      <a href="{% url 'login' %}" class="top-link header-login" data-header-auth="login">Log in</a>
+      <a href="{% url 'signup' %}" class="nav-pill header-signup" data-header-auth="signup">Get started <span aria-hidden="true">↗</span></a>
     </nav>
   </div>
 </header>
 {% if messages %}<div class="container" role="status">{% for msg in messages %}<div class="notice">{{msg}}</div>{% endfor %}</div>{% endif %}
 <main id="main-content">{% block content %}{% endblock %}</main>
-<footer class="site-footer"><div class="container footer"><span>© 2026 Mental Health Detector</span><span>A space for self-reflection, not a substitute for professional care.</span><a href="{% url 'demo' %}">Visit your space <span aria-hidden="true">↗</span></a></div></footer>
+<footer class="site-footer"><div class="container footer"><span>© 2026 Mental Health Detector</span><span>For personal reflection, not diagnosis or emergency care.</span><a href="{% url 'demo' %}">Open workspace →</a></div></footer>
 {% block scripts %}{% endblock %}
 </body>
 </html>

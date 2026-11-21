@@ -1,5 +1,7 @@
 # Mental Health Detector
 
+[**Open the live Mental Health Detector website**](https://mental-health-tracker-rosy.vercel.app/) · [**Interactive dashboard**](https://mental-health-tracker-rosy.vercel.app/demo/)
+
 A polished, interactive Django web app for non-diagnostic self-reflection. It supports an **offline/browser-only demo** and optional **per-user cloud accounts backed by Supabase Auth + PostgreSQL**.
 
 ## What is included
@@ -14,7 +16,7 @@ A polished, interactive Django web app for non-diagnostic self-reflection. It su
 
 1. Create a **new Supabase project** in an organization and region of your choice.
 2. Run `supabase_schema.sql` **only in that new project** using Supabase SQL Editor. This creates `mindspace_journals` and `mindspace_checkins` with owner-only RLS policies. Do not use the old SQLite database.
-3. In Supabase → Authentication → Providers, enable Email. Configure email confirmation and rate limits for your intended usage; email delivery setup is needed for reliable production signups.
+3. In Supabase → Authentication → URL Configuration, set the **Site URL** to `https://mental-health-tracker-rosy.vercel.app` and allow `https://mental-health-tracker-rosy.vercel.app/**` as a redirect URL. Then under Providers, enable Email. Configure email confirmation and rate limits for your intended usage; email delivery setup is needed for reliable production signups.
 4. In Vercel, deploy the repository with framework `django` and `.python-version` = 3.12. Add the environment variables below to Production and Preview and redeploy.
 
 ```dotenv
@@ -28,6 +30,12 @@ DJANGO_ALLOWED_HOSTS=.vercel.app
 `SUPABASE_PUBLISHABLE_KEY` is intentionally public; Supabase verifies each access token and RLS protects the tables. **Never expose a Supabase service-role/secret key** in the client or store user data in the source repository.
 
 The new cloud API does **not** require `DATABASE_URL` or Django ORM migrations. The original Django ORM-backed views remain for historical compatibility and are gated off without a separate `DATABASE_URL`; the modern `/demo/` workspace uses Supabase cloud APIs when configured.
+
+### Authentication and email confirmation
+
+Both **Log in** and **Create account** use the Supabase Auth flow at `/demo/?auth=login` and `/demo/?auth=signup`. The old Django ORM authentication pages are intentionally not used in production without a separate `DATABASE_URL`. Password reset links return to `/demo/?auth=reset`.
+
+For email verification and password recovery to return to the correct website, in the Supabase project dashboard open **Authentication → URL Configuration**. Set the **Site URL** to `https://mental-health-tracker-rosy.vercel.app` and add `https://mental-health-tracker-rosy.vercel.app/**` to the allowlist. Confirm that the Email provider and outgoing email service are configured. Delivery quotas and email confirmation requirements depend on your Supabase plan/settings.
 
 ### Run locally
 
@@ -56,3 +64,7 @@ All protected API endpoints require a Bearer JWT, verified by Supabase Auth. Nev
 The original public GitHub history included a SQLite database and an insecure hard-coded Django key; these have been excluded from this rebuild but remain visible in historical commits until repository history is remediated. Do not migrate sensitive records without user consent and a privacy review.
 
 This project is **not a medical device, medical diagnosis, or emergency service**. Journaling, sentiment scores, and the ten-question check-in do not determine whether someone has a mental health condition. A separate clinical, security, privacy, and retention review is necessary before accepting sensitive real-world records at scale. For Supabase production, configure email deliverability, anti-abuse/rate limiting, and appropriate consent/privacy notices.
+
+### GitHub About website link
+
+The website URL is shown above in this README. To also display it in the right-hand **About → Website** metadata field on GitHub, repository administrators must set that field in GitHub's repository About settings (gear icon), unless they have a GitHub API integration with repository metadata-write permission. Use `https://mental-health-tracker-rosy.vercel.app/`.

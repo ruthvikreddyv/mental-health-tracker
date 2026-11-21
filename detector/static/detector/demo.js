@@ -1,4 +1,4 @@
-/* Mental Health Detector: browser demo plus Supabase Auth / Django API-backed private accounts. */
+/* Mental Health Detector: browser-only demo and Supabase Auth-backed private accounts. */
 (() => {
   'use strict';
   const KEY='mindful_space_private_demo_v2';
@@ -14,7 +14,7 @@
   try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&Array.isArray(saved.journals)&&Array.isArray(saved.checkins))local=saved;}catch(_){local=blank()}
   state=local;
   try{document.documentElement.dataset.theme=localStorage.getItem(THEME)==='dark'?'dark':'light'}catch(_){}
-  const toast=(msg)=>{const el=$('app-toast');el.textContent=String(msg);el.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),4200)};
+  const toast=(msg)=>{const el=$('app-toast');el.textContent=String(msg);el.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),5800)};
   const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(local));return true}catch(_){toast('Browser storage is unavailable. Your changes may not persist.');return false}};
   const authenticated=()=>!!user;
   const toEntry=x=>({...x,at:x.at||x.created_at});
@@ -26,54 +26,147 @@
     let data;try{data=await response.json()}catch(_){throw Error('The server returned an invalid response.')}
     if(!response.ok)throw Error(data.error||'Cloud operation failed.');return data;
   };
-  const loadRemote=async()=>{if(!authenticated())return;try{
+  const loadRemote=async()=>{if(!authenticated())return false;try{
       const [j,c]=await Promise.all([api('journals/'),api('checkins/')]);
       state=normalize({journals:j.items,checkins:c.items});render();
-    }catch(e){toast(e.message);}
+      return true;
+    }catch(e){toast('Signed in, but syncing your saved data failed: '+e.message);return false;}
   };
   const setMode=()=>{
     const account=authenticated(), ready=cloudReady;
-    $('data-mode-label').textContent=account?'Encrypted connection · Cloud account':ready?'Browser-only demo · Sign in to sync':'Browser-only demo · Cloud not connected';
+    $('data-mode-label').textContent=account?('Signed in: '+(user.email||'private account')):ready?'Demo mode · Sign in to save across devices':'Demo mode · Cloud sign-in unavailable';
     document.querySelector('.data-status').classList.toggle('cloud',account);
     $('cloud-auth-open').classList.toggle('hidden',!ready||account);
     $('cloud-signout').classList.toggle('hidden',!account);
     $('privacy-status-title').textContent=account?'Private cloud account.':'Private browser demo.';
     $('privacy-status-copy').textContent=account?'Your account-specific entries are stored in Supabase and access-controlled using row-level security. Do not enter information you would not want stored online.':'This demo saves reflections in this browser’s local storage. They are not encrypted or uploaded to our server. Do not use on shared devices.';
-    $('mode-footer').textContent=account?'Protected cloud account':'Private browser demo';
+    $('mode-footer').textContent=account?'Saved to your private account':'Saved in this browser only';
     $('settings-storage-note').textContent=account?'Account entries are stored in Supabase with per-user access rules. Export or delete your stored entries at any time. Demo entries are not uploaded automatically.':'Browser demo entries remain in local storage, unencrypted. Create a cloud account when storage becomes available.';
     $('import-cloud-row').classList.toggle('hidden',!account);
   };
+  const info=(message,kind='success')=>{
+    const el=$('auth-info');el.textContent=message;el.classList.remove('hidden');el.dataset.kind=kind;
+  };
+  const clearAuthErrors=()=>{
+    ['auth-error','auth-recovery-error','auth-new-password-error'].forEach(id=>$(id).classList.add('hidden'));
+    $('auth-info').classList.add('hidden');
+  };
+  const formError=(id,message)=>{const el=$(id);el.textContent=message;el.classList.remove('hidden');};
+  const redirectURL=()=>window.location.origin+'/demo/?auth=verified';
+  const formatAuthError=e=>{
+    const msg=(e?.message||'Unexpected error').toLowerCase();
+    if(msg.includes('invalid login credentials'))return 'Email or password is incorrect. Try again, or reset your password.';
+    if(msg.includes('email not confirmed'))return 'Confirm your email address before logging in. Check your inbox and spam folder.';
+    if(msg.includes('rate limit')||msg.includes('too many requests'))return 'Too many attempts. Please try again after a short break.';
+    if(msg.includes('user already registered'))return 'An account with that email already exists. Please log in.';
+    if(msg.includes('password'))return e.message;
+    return e?.message||'This action could not be completed. Please try again.';
+  };
   const setAuthMode=mode=>{
-    authMode=mode;setText('auth-heading',mode==='signup'?'Create your space':'Welcome back');
-    setText('auth-description',mode==='signup'?'A private space you can return to anytime.':'Sign in to access your saved reflections and check-ins.');
-    $('auth-login-tab').classList.toggle('tab-selected',mode==='login');$('auth-signup-tab').classList.toggle('tab-selected',mode==='signup');
+    authMode=mode;clearAuthErrors();
+    $('auth-form').classList.toggle('hidden',mode==='recovery'||mode==='reset'||mode==='confirm');
+    $('auth-recovery-form').classList.toggle('hidden',mode!=='recovery');
+    $('auth-new-password-form').classList.toggle('hidden',mode!=='reset');
+    $('auth-confirmation').classList.toggle('hidden',mode!=='confirm');
+    $('auth-confirm-wrap').classList.toggle('hidden',mode!=='signup');
+    $('auth-password').autocomplete=mode==='signup'?'new-password':'current-password';
+    $('auth-tabs').classList.toggle('hidden',!['login','signup'].includes(mode));
+    $('auth-login-tab').classList.toggle('tab-selected',mode==='login');
+    $('auth-signup-tab').classList.toggle('tab-selected',mode==='signup');
     $('auth-login-tab').setAttribute('aria-selected',String(mode==='login'));
     $('auth-signup-tab').setAttribute('aria-selected',String(mode==='signup'));
-    $('auth-password').autocomplete=mode==='signup'?'new-password':'current-password';
-    setText('auth-submit',mode==='signup'?'Create account →':'Sign in securely →');$('auth-error').classList.add('hidden');
+    $('auth-forgot').classList.toggle('hidden',mode!=='login');
+    $('auth-heading').textContent={signup:'Create your account',login:'Welcome back',recovery:'Reset your password',reset:'Set a new password',confirm:'One more step'}[mode]||'Welcome back';
+    $('auth-description').textContent={signup:'Keep your reflections safely with your own account.',login:'Sign in to access your private journal and check-ins.',recovery:'We’ll send a secure password reset link to your email.',reset:'Choose a new password for your private account.',confirm:'Confirm your email to finish creating your account.'}[mode]||'';
+    $('auth-submit').textContent=mode==='signup'?'Create my account →':'Log in securely →';
   };
-  const modal=show=>{ $('auth-modal').classList.toggle('hidden',!show); if(show){setAuthMode('login');$('auth-email').focus()}else if(!$('cloud-auth-open').classList.contains('hidden')) $('cloud-auth-open').focus(); };
-  $('cloud-auth-open').addEventListener('click',()=>{if(cloudReady)modal(true);else toast('Account connection is not configured yet. You can explore the demo.')});
+  let lastFocused=null;
+  const modal=(show,mode='login')=>{
+    $('auth-modal').classList.toggle('hidden',!show);
+    document.body.classList.toggle('auth-open',show);
+    if(show){lastFocused=document.activeElement;setAuthMode(mode);window.setTimeout(()=>{
+      if(mode==='recovery')$('auth-recovery-email').focus();
+      else if(mode==='reset')$('auth-new-password').focus();
+      else $('auth-email').focus();
+    },0);}else if(lastFocused&&lastFocused.isConnected)lastFocused.focus();
+  };
+  $('cloud-auth-open').addEventListener('click',()=>modal(true));
   $('auth-close').addEventListener('click',()=>modal(false));
   $('auth-modal').addEventListener('click',e=>{if(e.target===$('auth-modal'))modal(false)});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('auth-modal').classList.contains('hidden'))modal(false)});
+  document.addEventListener('keydown',e=>{
+    if($('auth-modal').classList.contains('hidden'))return;
+    if(e.key==='Escape')modal(false);
+    if(e.key==='Tab'){
+      const list=[...$('auth-modal').querySelectorAll('button,input,a')].filter(el=>!el.closest('.hidden')&&!el.disabled&&el.offsetParent!==null);
+      if(!list.length)return;
+      if(e.shiftKey&&document.activeElement===list[0]){e.preventDefault();list[list.length-1].focus()}
+      else if(!e.shiftKey&&document.activeElement===list[list.length-1]){e.preventDefault();list[0].focus()}
+    }
+  });
   $('auth-login-tab').addEventListener('click',()=>setAuthMode('login'));
   $('auth-signup-tab').addEventListener('click',()=>setAuthMode('signup'));
+  $('auth-forgot').addEventListener('click',()=>{$('auth-recovery-email').value=$('auth-email').value;setAuthMode('recovery')});
+  $('auth-back-login').addEventListener('click',()=>setAuthMode('login'));
+  $('auth-confirm-back').addEventListener('click',()=>setAuthMode('login'));
+  $('auth-show-password').addEventListener('click',()=>{
+    const hidden=$('auth-password').type==='password';$('auth-password').type=hidden?'text':'password';
+    $('auth-show-password').textContent=hidden?'Hide':'Show';
+    $('auth-show-password').setAttribute('aria-label',hidden?'Hide password':'Show password');
+  });
   $('auth-form').addEventListener('submit',async e=>{
-    e.preventDefault();if(busy||!cloud)return;
-    const email=$('auth-email').value.trim(),password=$('auth-password').value;
-    if(password.length<8){$('auth-error').textContent='Use a password of at least 8 characters.';$('auth-error').classList.remove('hidden');return}
-    busy=true;$('auth-submit').disabled=true;
+    e.preventDefault();if(busy)return;
+    if(!cloud){formError('auth-error','Account connection is unavailable. Refresh the page, or use the browser-only demo.');return;}
+    clearAuthErrors();
+    const email=$('auth-email').value.trim().toLowerCase(),password=$('auth-password').value;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){formError('auth-error','Enter a valid email address.');return;}
+    if(password.length<8){formError('auth-error','Your password must be at least 8 characters.');return;}
+    if(authMode==='signup'&&password!==$('auth-password-confirm').value){formError('auth-error','Passwords do not match.');return;}
+    busy=true;const button=$('auth-submit');const before=button.textContent;button.disabled=true;button.textContent=authMode==='signup'?'Creating account…':'Signing in…';
     try{
-      const {data,error}=authMode==='signup'?await cloud.auth.signUp({email,password}):await cloud.auth.signInWithPassword({email,password});
+      const {data,error}=authMode==='signup'
+        ? await cloud.auth.signUp({email,password,options:{emailRedirectTo:redirectURL()}})
+        : await cloud.auth.signInWithPassword({email,password});
       if(error)throw error;
-      if(authMode==='signup'&&!data.session){toast('Check your email to verify your new account before signing in.');modal(false);}
-      else{user=data.user;state=blank();modal(false);setMode();await loadRemote();toast('Your private account is ready.');}
-    }catch(err){$('auth-error').textContent=err.message||'Unable to sign in';$('auth-error').classList.remove('hidden')}
-    finally{busy=false;$('auth-submit').disabled=false}
+      if(authMode==='signup'&&!data.session){setAuthMode('confirm');return;}
+      if(!data?.session?.access_token)throw Error('No session returned. Please confirm your email and try again.');
+      user=data.user||data.session.user;state=blank();modal(false);setMode();
+      const synced=await loadRemote();if(synced)toast(authMode==='signup'?'Account created. Your journal is ready.':'Welcome back. Your entries are ready.');
+    }catch(err){formError('auth-error',formatAuthError(err))}
+    finally{busy=false;button.disabled=false;button.textContent=before;}
+  });
+  $('auth-resend').addEventListener('click',async()=>{
+    if(!cloud)return;
+    const button=$('auth-resend');button.disabled=true;button.textContent='Sending…';
+    try{const {error}=await cloud.auth.resend({type:'signup',email:$('auth-email').value.trim(),options:{emailRedirectTo:redirectURL()}});
+      if(error)throw error;info('If the address can receive signup email, a new confirmation message has been sent.');
+    }catch(e){info(formatAuthError(e),'error')}finally{button.disabled=false;button.textContent='Resend confirmation email'}
+  });
+  $('auth-recovery-form').addEventListener('submit',async e=>{
+    e.preventDefault();if(busy)return;
+    const email=$('auth-recovery-email').value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){formError('auth-recovery-error','Enter a valid email address.');return}
+    if(!cloud){formError('auth-recovery-error','Account service is unavailable. Try again later.');return}
+    busy=true;const button=$('auth-recovery-submit');button.disabled=true;
+    try{const {error}=await cloud.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/demo/?auth=reset'});
+      if(error)throw error;info('If the address has an account, a password reset link has been sent. Check your inbox and spam folder.');
+    }catch(e){formError('auth-recovery-error',formatAuthError(e))}
+    finally{busy=false;button.disabled=false;}
+  });
+  $('auth-new-password-form').addEventListener('submit',async e=>{
+    e.preventDefault();if(busy||!cloud)return;
+    const password=$('auth-new-password').value;
+    if(password.length<8){formError('auth-new-password-error','Use at least 8 characters.');return}
+    if(password!==$('auth-new-password-confirm').value){formError('auth-new-password-error','Passwords do not match.');return}
+    busy=true;const btn=$('auth-new-password-submit');btn.disabled=true;
+    try{const {error}=await cloud.auth.updateUser({password});if(error)throw error;setAuthMode('login');info('Password updated successfully. You can now log in.');}
+    catch(e){formError('auth-new-password-error',formatAuthError(e))}
+    finally{busy=false;btn.disabled=false;}
   });
   $('cloud-signout').addEventListener('click',async()=>{
-    if(cloud){await cloud.auth.signOut();}user=null;state=local;setMode();render();toast('Signed out. Demo mode is available.');
+    if(!cloud)return;
+    try{const {error}=await cloud.auth.signOut();if(error)throw error;
+      user=null;state=local;setMode();render();toast('Signed out. You can continue in demo mode.');
+    }catch(e){toast('Could not sign out: '+formatAuthError(e));}
   });
   $('theme-toggle').addEventListener('click',()=>{
     const next=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=next;
@@ -81,7 +174,7 @@
     $('theme-toggle').textContent=next==='dark'?'☼':'☾';$('theme-toggle').setAttribute('aria-label',next==='dark'?'Switch to light mode':'Switch to dark mode');
   });
   $('theme-toggle').textContent=document.documentElement.dataset.theme==='dark'?'☼':'☾';$('theme-toggle').setAttribute('aria-label',document.documentElement.dataset.theme==='dark'?'Switch to light mode':'Switch to dark mode');
-  const titles={overview:['Your day, at your pace.','A little space to notice how you’re doing.'],journal:['A page for your thoughts.','Take a moment to put things into words.'],checkin:['A gentle check-in.','No judgment. Just a moment of reflection.'],insights:['The story of your days.','Notice the little steps you’ve taken.'],support:['You deserve support.','Whatever today holds, you don’t have to face it alone.'],settings:['Your space, your choices.','Decide what you want to keep or remove.']};
+  const titles={overview:['Your wellbeing, at a glance.','How are you feeling today? Start wherever you like.'],journal:['A page for your thoughts.','Take a moment to put things into words.'],checkin:['A gentle check-in.','No judgment. Just a moment of reflection.'],insights:['The story of your days.','Notice the little steps you’ve taken.'],support:['You deserve support.','Whatever today holds, you don’t have to face it alone.'],settings:['Your space, your choices.','Decide what you want to keep or remove.']};
   function go(view){if(!titles[view])return;
     document.querySelectorAll('[data-view]').forEach(btn=>{btn.classList.toggle('side-active',btn.dataset.view===view);btn.setAttribute('aria-current',btn.dataset.view===view?'page':'false')});
     document.querySelectorAll('.demo-view').forEach(el=>el.classList.add('hidden'));
@@ -245,21 +338,75 @@
       await loadRemote();toast(`${imported} entries imported. Your browser-demo data was left unchanged.`);
     }catch(e){toast(`${imported} imported; remaining entries were not uploaded. ${e.message}`)}finally{busy=false}
   });
-  async function init(){
-    try{const response=await fetch('/api/config/',{cache:'no-store'});if(!response.ok)throw Error('config unavailable');const config=await response.json();
-      cloudReady=!!(config.cloud_enabled&&config.url&&config.publishable_key&&window.supabase?.createClient);
-      if(cloudReady){cloud=window.supabase.createClient(config.url,config.publishable_key,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
-        const {data}=await cloud.auth.getUser();user=data?.user||null;
-        cloud.auth.onAuthStateChange((event,session)=>{
-          if(event==='SIGNED_OUT'){user=null;state=local;setMode();render()}
-          else if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&session?.user){
-            const changed=!user||user.id!==session.user.id;user=session.user;setMode();if(changed){state=blank();queueMicrotask(loadRemote)}
-          }
+  async function loadSupabaseLibrary(){
+    if(window.supabase?.createClient)return true;
+    const urls=[
+      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js',
+      'https://unpkg.com/@supabase/supabase-js@2.49.10/dist/umd/supabase.js'
+    ];
+    for(const src of urls){
+      try{
+        await new Promise((resolve,reject)=>{
+          const script=document.createElement('script');
+          script.src=src;script.async=true;
+          script.onload=resolve;script.onerror=()=>reject(Error('Authentication library could not load'));
+          document.head.appendChild(script);
         });
-        if(user){state=blank();await loadRemote()}
+        if(window.supabase?.createClient)return true;
+      }catch(_){/* Try the alternate CDN. Browser demo remains available. */}
+    }
+    return false;
+  }
+  async function init(){
+    const params=new URLSearchParams(window.location.search);
+    const requestedAuth=params.get('auth');
+    const requestedView=params.get('view');
+    const requestedMood=Number(params.get('mood'));
+    if(requestedView&&['overview','journal','checkin','insights','support','settings'].includes(requestedView))go(requestedView);
+    if(Number.isInteger(requestedMood)&&requestedMood>=1&&requestedMood<=5){
+      const button=document.querySelector(`[data-mood="${requestedMood}"]`);
+      if(button)button.click();
+    }
+    // Opening /accounts/login/ and /signup/ redirects to this real Supabase UI.
+    if(requestedAuth==='login'||requestedAuth==='signup')modal(true,requestedAuth);
+    else if(requestedAuth==='reset')modal(true,'recovery');
+    try{
+      const response=await fetch('/api/config/',{cache:'no-store'});
+      if(!response.ok)throw Error('Could not check account configuration');
+      const config=await response.json();
+      cloudReady=!!(config.cloud_enabled&&config.url&&config.publishable_key&&await loadSupabaseLibrary());
+      if(!cloudReady){
+        if(requestedAuth)info('Sign-in cannot start because the account library did not load or cloud configuration is missing. Refresh to try again.','error');
+        return;
       }
-    }catch(e){console.warn('Cloud connection unavailable; browser demo remains functional.')}
-    setMode();render();
+      cloud=window.supabase.createClient(config.url,config.publishable_key,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+      cloud.auth.onAuthStateChange((event,session)=>{
+        if(event==='PASSWORD_RECOVERY'){
+          user=session?.user||null;
+          modal(true,'reset');
+          info('Your reset link was accepted. Choose a new password.');
+        }else if(event==='SIGNED_OUT'){user=null;state=local;setMode();render();}
+        else if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&session?.user){
+          const changed=!user||user.id!==session.user.id;user=session.user;setMode();
+          if(changed){state=blank();queueMicrotask(loadRemote)}
+        }
+      });
+      const {data,error}=await cloud.auth.getSession();
+      if(error)throw error;
+      user=data?.session?.user||null;
+      if(user){state=blank();await loadRemote();
+        if(requestedAuth==='verified'){toast('Your account is verified and signed in.');}
+        if(requestedAuth==='reset')modal(true,'reset');
+        else if(['login','signup'].includes(requestedAuth))modal(false);
+      }else if(requestedAuth==='verified'){
+        modal(true,'login');info('Email verified. Log in with your email and password.');
+      }else if(requestedAuth==='reset'){
+        // When recovery token is still exchanging, wait for PASSWORD_RECOVERY.
+        info('Finishing password recovery. If this screen does not change, reopen your reset link.');
+      }
+    }catch(e){console.warn('Account initialization:',e?.message||e);
+      if(requestedAuth)info('Account service could not be reached. Please refresh or try again later.','error');
+    }finally{setMode();render();}
   }
   init();
 })();
