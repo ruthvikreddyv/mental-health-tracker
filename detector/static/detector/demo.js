@@ -1,4 +1,4 @@
-/* Mindful Space: browser demo plus Supabase Auth / Django API-backed private accounts. */
+/* Mental Health Detector: browser demo plus Supabase Auth / Django API-backed private accounts. */
 (() => {
   'use strict';
   const KEY='mindful_space_private_demo_v2';
@@ -226,7 +226,7 @@
   $('export-data').addEventListener('click',()=>{
     const out={version:3,mode:authenticated()?'cloud':'browser-demo',exported_at:new Date().toISOString(),journals:state.journals,checkins:state.checkins};
     const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
-    link.href=url;link.download='mindful-space-data.json';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Your data was exported.');
+    link.href=url;link.download='mental-health-detector-data.json';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Your data was exported.');
   });
   $('clear-data').addEventListener('click',async()=>{
     if(!confirm(authenticated()?'Delete all your cloud journal entries and check-ins? This cannot be undone. Your account will remain.':'Delete all your browser-demo entries? This cannot be undone.'))return;

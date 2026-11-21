@@ -1,4 +1,4 @@
-# Mindful Space — Mental Health Tracker
+# Mental Health Detector
 
 A polished, interactive Django web app for non-diagnostic self-reflection. It supports an **offline/browser-only demo** and optional **per-user cloud accounts backed by Supabase Auth + PostgreSQL**.
 
