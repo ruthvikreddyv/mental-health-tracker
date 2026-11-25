@@ -4,6 +4,7 @@
 
 A polished, interactive Django web app for non-diagnostic self-reflection. It supports an **offline/browser-only demo** and optional **per-user cloud accounts backed by Supabase Auth + PostgreSQL**.
 
+
 ## What is included
 
 - Responsive web UI with dashboard, mood selection, daily journaling, full-text search, activity charts, a ten-question check-in, support resources, privacy controls, export/delete, and dark mode.
